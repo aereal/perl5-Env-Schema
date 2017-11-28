@@ -1,0 +1,4 @@
+name = "Env-Schema"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+
