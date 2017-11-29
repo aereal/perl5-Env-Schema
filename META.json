@@ -47,11 +47,23 @@
       },
       "test" : {
          "requires" : {
+            "Test::Deep" : "0",
             "Test::More" : "0.98"
          }
       }
    },
    "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aereal/perl5-Env-Schema/issues"
+      },
+      "homepage" : "https://github.com/aereal/perl5-Env-Schema",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/aereal/perl5-Env-Schema.git",
+         "web" : "https://github.com/aereal/perl5-Env-Schema"
+      }
+   },
    "version" : "0.01",
    "x_serialization_backend" : "JSON::PP version 2.27300_01"
 }
