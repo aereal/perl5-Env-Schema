@@ -28,6 +28,35 @@ subtest 'common' => sub {
   };
 };
 
+subtest 'optional' => sub {
+  my $schema = Env::Schema->new;
+  cmp_deeply $schema, isa('Env::Schema');
+  $schema->optional('X_USER_NAME');
+
+  subtest 'pass optional field' => sub {
+    my $input = +{
+      %ENV,
+      'X_USER_NAME' => 'xxx',
+    };
+    local %ENV = %$input;
+    my $result = $schema->validates;
+    ok $result->valid;
+    cmp_deeply $result->value, +{
+      'X_USER_NAME' => 'xxx',
+    };
+  };
+
+  subtest 'do NOT pass optional field' => sub {
+    my $input = +{
+      %ENV,
+    };
+    local %ENV = %$input;
+    my $result = $schema->validates;
+    ok $result->valid;
+    cmp_deeply $result->value, +{};
+  };
+};
+
 done_testing;
 
 1;

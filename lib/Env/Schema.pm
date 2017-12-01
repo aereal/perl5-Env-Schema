@@ -17,7 +17,23 @@ sub new {
 
 sub requires {
   my ($self, $name) = @_;
-  push @{$self->{constraints}}, $self->_compile_constraint(name => $name);
+  push @{$self->{constraints}}, $self->_compile_constraint(
+    name => $name,
+    validator => sub {
+      my ($value) = @_;
+      return sprintf 'Missing required field: %s', $name unless defined $value;
+      return undef;
+    },
+  );
+  return;
+}
+
+sub optional {
+  my ($self, $name) = @_;
+  push @{$self->{constraints}}, $self->_compile_constraint(
+    name => $name,
+    validator => sub { return undef },
+  );
   return;
 }
 
@@ -31,9 +47,10 @@ sub validates {
     my $error = $validator->($value); # TODO: normalize
     if ($error) {
       $result->add_error($error);
-    } else {
+    } elsif (defined $value) {
       $result->add_value($constraint->{name}, $value);
     }
+    # do nothing optional field with no values
   }
   return $result;
 }
@@ -41,7 +58,7 @@ sub validates {
 sub _compile_constraint {
   my ($self, %args) = @_;
   my $name = $args{name};
-  my $validator = sub {}; # TODO
+  my $validator = $args{validator};
   return +{
     name => $name,
     validator => $validator,
