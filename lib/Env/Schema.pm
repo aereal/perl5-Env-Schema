@@ -5,7 +5,48 @@ use warnings;
 
 our $VERSION = "0.01";
 
+use Env::Schema::ValidatedResult;
 
+sub new {
+  my ($class) = @_;
+  my $self = bless {
+    constraints => [],
+  }, $class;
+  return $self;
+}
+
+sub requires {
+  my ($self, $name) = @_;
+  push @{$self->{constraints}}, $self->_compile_constraint(name => $name);
+  return;
+}
+
+sub validates {
+  my ($self, $target) = @_;
+  $target = \%ENV unless defined $target;
+  my $result = Env::Schema::ValidatedResult->new;
+  for my $constraint (@{$self->{constraints}}) {
+    my $value = $target->{$constraint->{name}};
+    my $validator = $constraint->{validator};
+    my $error = $validator->($value); # TODO: normalize
+    if ($error) {
+      $result->add_error($error);
+    } else {
+      $result->add_value($constraint->{name}, $value);
+    }
+  }
+  return $result;
+}
+
+sub _compile_constraint {
+  my ($self, %args) = @_;
+  my $name = $args{name};
+  my $validator = sub {}; # TODO
+  return +{
+    name => $name,
+    validator => $validator,
+  };
+}
 
 1;
 __END__
